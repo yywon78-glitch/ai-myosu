@@ -1,0 +1,26 @@
+{
+  "name": "고전 사활 문제풀기",
+  "short_name": "고전사활",
+  "description": "현현기경·관자보·발양론·기경중묘·천룡도 등 고전 사활(묘수) 문제 풀이 — 오프라인 지원",
+  "lang": "ko",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a252f",
+  "theme_color": "#1a252f",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
