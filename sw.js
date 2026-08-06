@@ -1,7 +1,6 @@
-/* 고전 사활 문제풀기 — 서비스워커
-   HTML(index.html)은 network-first: 온라인이면 항상 최신 버전 자동 반영,
-   오프라인이면 캐시로 폴백. 정적 파일(아이콘 등)은 cache-first. */
-const CACHE = 'gojeon-sahwal-v21';
+﻿/* 怨좎쟾 ?ы솢 臾몄젣?湲????쒕퉬?ㅼ썙而?   HTML(index.html)? network-first: ?⑤씪?몄씠硫???긽 理쒖떊 踰꾩쟾 ?먮룞 諛섏쁺,
+   ?ㅽ봽?쇱씤?대㈃ 罹먯떆濡??대갚. ?뺤쟻 ?뚯씪(?꾩씠肄???? cache-first. */
+const CACHE = 'gojeon-sahwal-v22';
 const ASSETS = [
   '.',
   'index.html',
@@ -35,7 +34,7 @@ self.addEventListener('fetch', (e) => {
     || url.pathname.endsWith('.html');
 
   if (isHTML) {
-    // network-first: 온라인이면 최신 HTML → 자동 갱신, 오프라인이면 캐시
+    // network-first: ?⑤씪?몄씠硫?理쒖떊 HTML ???먮룞 媛깆떊, ?ㅽ봽?쇱씤?대㈃ 罹먯떆
     e.respondWith(
       fetch(req).then((res) => {
         if (res && res.status === 200) {
@@ -48,7 +47,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 정적 파일: cache-first
+  // ?뺤쟻 ?뚯씪: cache-first
   e.respondWith(
     caches.match(req).then((hit) => hit || fetch(req).then((res) => {
       if (res && res.status === 200 && res.type === 'basic') {
