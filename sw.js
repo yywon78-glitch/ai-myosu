@@ -1,8 +1,14 @@
 /* 고전 사활 문제풀기 — 서비스워커
-   전체 network-first: 온라인이면 항상 최신 버전 자동 반영
-   오프라인이면 캐시로 폴백 */
-const CACHE = 'gojeon-sahwal-v23';
-const ASSETS = ['.', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
+   HTML(index.html)은 network-first: 온라인이면 항상 최신 버전 자동 반영,
+   오프라인이면 캐시로 폴백. 정적 파일(아이콘 등)은 cache-first. */
+const CACHE = 'gojeon-sahwal-v21';
+const ASSETS = [
+  '.',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -20,14 +26,36 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  // 모든 파일 network-first: 온라인이면 항상 서버에서 최신 파일 가져옴
+  const req = e.request;
+  const url = new URL(req.url);
+  const isHTML = req.mode === 'navigate'
+    || req.destination === 'document'
+    || url.pathname === '/'
+    || url.pathname.endsWith('/')
+    || url.pathname.endsWith('.html');
+
+  if (isHTML) {
+    // network-first: 온라인이면 최신 HTML → 자동 갱신, 오프라인이면 캐시
+    e.respondWith(
+      fetch(req).then((res) => {
+        if (res && res.status === 200) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy));
+        }
+        return res;
+      }).catch(() => caches.match(req).then((r) => r || caches.match('index.html')))
+    );
+    return;
+  }
+
+  // 정적 파일: cache-first
   e.respondWith(
-    fetch(e.request).then((res) => {
-      if (res && res.status === 200) {
+    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+      if (res && res.status === 200 && res.type === 'basic') {
         const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        caches.open(CACHE).then((c) => c.put(req, copy));
       }
       return res;
-    }).catch(() => caches.match(e.request).then((r) => r || caches.match('index.html')))
+    }).catch(() => caches.match('index.html')))
   );
 });
