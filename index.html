@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v2.9</title>
+    <title>고전 사활 문제풀기 v3.0</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -4521,8 +4521,9 @@
         var _mgObserver=null;
         function showGallery() {
             var g=document.getElementById('mini-gallery'); if(!g) return;
-            _mgSelectedIdx = -1;
+            _mgSelectedIdx = -1; _mgScrolled = false;
             var btn=document.getElementById('mg-open-btn'); if(btn) btn.style.display='none';
+            _bindMgScrollDetect();
             document.getElementById('mg-coll-name').textContent = selectedFolderCol ? (selectedFolderCol.display||'문제') : '문제';
             document.getElementById('mg-count').textContent = PROBLEMS.length ? (PROBLEMS.length+'문제 — 문제를 선택하세요') : '';
             var grid=document.getElementById('mg-grid'); grid.innerHTML='';
@@ -4552,9 +4553,10 @@
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
                 // 탭/클릭 → 선택(하이라이트) + 열기 버튼 표시
+                // 스크롤 직후 click은 _mgScrolled 플래그로 차단
                 // 더블클릭(PC) → 바로 열기
                 (function(i){
-                    cell.addEventListener('click', function(){ selectCell(i); });
+                    cell.addEventListener('click', function(){ if(!_mgScrolled) selectCell(i); });
                     cell.addEventListener('dblclick', function(){ enterFromGallery(i); });
                 })(idx);
                 frag.appendChild(cell);
@@ -4567,6 +4569,18 @@
             var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
         }
         var _mgSelectedIdx = -1;
+        var _mgScrolled = false, _mgTouchY = 0, _mgScrollListenerBound = false;
+        function _bindMgScrollDetect() {
+            if (_mgScrollListenerBound) return;
+            _mgScrollListenerBound = true;
+            document.addEventListener('touchstart', function(e){
+                _mgScrolled = false;
+                _mgTouchY = e.touches[0].clientY;
+            }, {passive:true});
+            document.addEventListener('touchmove', function(e){
+                if(Math.abs(e.touches[0].clientY - _mgTouchY) > 10) _mgScrolled = true;
+            }, {passive:true});
+        }
         function selectCell(i) {
             _mgSelectedIdx = i;
             var grid = document.getElementById('mg-grid');
