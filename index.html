@@ -581,7 +581,7 @@
         #mg-head .mg-title { font-size:16px; font-weight:700; color:#f5e6c8; }
         #mg-head .mg-sub { font-size:12px; color:#9fb0c0; }
         #mg-grid { flex:1 1 auto; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:10px; padding:14px; align-content:start; }
-        .mg-cell { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px 5px; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:8px; cursor:pointer; transition:all .12s; }
+        .mg-cell { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px 5px; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:8px; cursor:pointer; transition:all .12s; touch-action:manipulation; }
         .mg-cell:hover { border-color:#d4a056; background:rgba(212,160,86,0.18); transform:translateY(-2px); }
         .mg-cell.solved { border-color:rgba(46,204,113,0.5); }
         .mg-cell.solved .mg-num { color:#2ecc71; }
@@ -4545,35 +4545,18 @@
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
-                // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
-                // _galMoved(touchmove 감지) + scrollTop 변화 둘 다 체크 — 스크롤 중 열림 방지
-                (function(i, g){
-                    var lastTap=0, startScrollY=0;
-                    cell.addEventListener('touchstart', function(){ startScrollY=g.scrollTop; }, {passive:true});
-                    cell.addEventListener('touchend', function(e){
-                        if(_galMoved || Math.abs(g.scrollTop-startScrollY)>5) { lastTap=0; return; }
-                        var now=Date.now();
-                        if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
-                        else lastTap=now;
-                    }, {passive:false});
-                    cell.ondblclick=function(){ enterFromGallery(i); };
-                })(idx, grid);
+                // 더블클릭(PC) / 더블탭(모바일) 으로만 진입 — touch 이벤트 불사용
+                (function(i){
+                    cell.addEventListener('dblclick', function(){ enterFromGallery(i); });
+                })(idx);
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
             });
             grid.appendChild(frag);
-            bindGalleryScroll(grid);      // 스크롤 vs 탭 구분(1회 바인딩)
             g.style.display='flex';
             document.body.classList.add('gallery-open');   // 햄버거 숨김
             document.getElementById('mg-back').style.display='none';
             var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
-        }
-        // 갤러리 스크롤 감지: 손가락이 움직이면(스크롤) 셀 선택 억제
-        var _galMoved=false, _galY=0, _galScrollBound=false;
-        function bindGalleryScroll(grid){
-            if(_galScrollBound || !grid) return; _galScrollBound=true;
-            grid.addEventListener('touchstart', function(e){ if(e.touches[0]){ _galY=e.touches[0].clientY; _galMoved=false; } }, {passive:true});
-            grid.addEventListener('touchmove', function(e){ if(e.touches[0] && Math.abs(e.touches[0].clientY-_galY)>10) _galMoved=true; }, {passive:true});
         }
         function enterFromGallery(i) {
             var g=document.getElementById('mini-gallery'); if(g) g.style.display='none';
