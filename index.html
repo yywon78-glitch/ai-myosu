@@ -4546,12 +4546,12 @@
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
                 // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
-                // scrollTop 변화로 스크롤 여부 판단 (플래그 타이밍 문제 없음)
+                // _galMoved(touchmove 감지) + scrollTop 변화 둘 다 체크 — 스크롤 중 열림 방지
                 (function(i, g){
                     var lastTap=0, startScrollY=0;
                     cell.addEventListener('touchstart', function(){ startScrollY=g.scrollTop; }, {passive:true});
                     cell.addEventListener('touchend', function(e){
-                        if(Math.abs(g.scrollTop-startScrollY)>5) return;
+                        if(_galMoved || Math.abs(g.scrollTop-startScrollY)>5) { lastTap=0; return; }
                         var now=Date.now();
                         if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
                         else lastTap=now;
