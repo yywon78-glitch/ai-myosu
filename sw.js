@@ -1,10 +1,8 @@
 /* 고전 사활 문제풀기 — 서비스워커
-   HTML(index.html)은 network-first: 온라인이면 항상 최신 버전 자동 반영,
-   오프라인이면 캐시로 폴백. 정적 파일(아이콘 등)은 cache-first. */
-const CACHE = 'gojeon-sahwal-v24';
+   HTML은 항상 서버에서 직접 가져옴 (캐시 완전 무시)
+   정적 파일(아이콘 등)은 cache-first. */
+const CACHE = 'gojeon-sahwal-v25';
 const ASSETS = [
-  '.',
-  'index.html',
   'manifest.json',
   'icon-192.png',
   'icon-512.png'
@@ -35,15 +33,11 @@ self.addEventListener('fetch', (e) => {
     || url.pathname.endsWith('.html');
 
   if (isHTML) {
-    // network-first: 온라인이면 최신 HTML → 자동 갱신, 오프라인이면 캐시
+    // HTML은 캐시 완전 무시하고 항상 서버에서 직접 가져옴
     e.respondWith(
-      fetch(req).then((res) => {
-        if (res && res.status === 200) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-        }
+      fetch(req, { cache: 'no-store' }).then((res) => {
         return res;
-      }).catch(() => caches.match(req).then((r) => r || caches.match('index.html')))
+      }).catch(() => caches.match('index.html'))
     );
     return;
   }
