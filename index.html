@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v2.6</title>
+    <title>고전 사활 문제풀기 v2.5</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -683,8 +683,7 @@
         .m-stat-2pane { flex:1 1 auto; display:flex; min-height:0; }
         #m-stat-left { flex:0 0 132px; overflow-y:auto; -webkit-overflow-scrolling:touch;
             border-right:1px solid rgba(245,230,200,0.15); background:rgba(0,0,0,0.18); padding:8px 6px; }
-        #m-stat-right { flex:1 1 auto; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
-        .msr-body { flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 10px 10px; }
+        #m-stat-right { flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 10px; }
         .msl-col { padding:9px 8px; margin-bottom:6px; border-radius:8px; cursor:pointer;
             border:1px solid rgba(245,230,200,0.12); background:rgba(0,0,0,0.25); -webkit-tap-highlight-color:transparent; }
         .msl-col.sel { border-color:#d4a056; background:rgba(212,160,86,0.25); }
@@ -692,8 +691,7 @@
         .msl-name { font-size:14px; font-weight:700; color:#f5e6c8; }
         .msl-cnt { font-size:12px; color:#9fb0c0; margin-top:3px; }
         .msl-cnt b { color:#2ecc71; font-size:14px; }
-        .msr-head { flex:0 0 auto; font-size:15px; font-weight:800; color:#f5d78a;
-            padding:10px 10px 8px; background:#1a252f; border-bottom:1px solid rgba(245,230,200,0.12); }
+        .msr-head { font-size:15px; font-weight:800; color:#f5d78a; padding:2px 2px 10px; }
         .msr-head span { font-size:12px; color:#7fe0c4; font-weight:600; margin-left:6px; }
         .m-stat-table { width:100%; border-collapse:collapse; table-layout:fixed; }
         .m-stat-table th { position:sticky; top:0; background:#243342; color:#d4a056;
@@ -824,7 +822,7 @@
         </section>
     </div>
     <div class="side-panel">
-        <h1 style="font-size:19px;letter-spacing:1px;">고전 사활 문제풀기 v2.6</h1>
+        <h1 style="font-size:19px;letter-spacing:1px;">고전 사활 문제풀기 v2.5</h1>
 
         <div style="font-size:16px;color:#e8dcc0;text-align:center;font-weight:600;margin:2px 0 4px;">완료 <b id="solved-count" style="color:#2ecc71;font-size:24px;">0</b> <span style="font-size:14px;color:#9aa;">/ <span id="total-count">347</span></span></div>
 
@@ -4262,6 +4260,7 @@
         let progress = (function(){ try { return JSON.parse(localStorage.getItem('hh_prog_'+collection)||'{}'); } catch(e){ return {}; } })();
         function saveProgress(){ try { localStorage.setItem('hh_prog_'+collection, JSON.stringify(progress)); } catch(e){} }
         var _rowEls = [];   // 행 DOM 캐시 (증분 갱신용)
+        var _listDownY = 0; // 스크롤 vs 클릭 판별용
         function buildList(){
             var tb = document.getElementById('prob-tbody'); if(!tb) return; tb.innerHTML='';
             _rowEls = [];
@@ -4279,7 +4278,7 @@
                 tr.appendChild(td(p.sol.length));
                 tr.appendChild(td(st.tries||0));
                 tr.appendChild(td(st.solves||0, st.solves?'pl-ok':''));
-                tr.onclick=function(){ loadProblem(i); };
+                tr.onclick=function(e){ if(Math.abs(e.clientY-_listDownY)>5) return; loadProblem(i); };
                 _rowEls[i]=tr;
                 frag.appendChild(tr);
             })(i); }
@@ -4558,11 +4557,11 @@
             var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
         }
         // 갤러리 스크롤 감지: 손가락이 움직이면(스크롤) 셀 선택 억제
-        var _galMoved=false, _galY=0, _galX=0, _galScrollBound=false;
+        var _galMoved=false, _galY=0, _galScrollBound=false;
         function bindGalleryScroll(grid){
             if(_galScrollBound || !grid) return; _galScrollBound=true;
-            grid.addEventListener('touchstart', function(e){ if(e.touches[0]){ _galY=e.touches[0].clientY; _galX=e.touches[0].clientX; _galMoved=false; } }, {passive:true});
-            grid.addEventListener('touchmove', function(e){ if(e.touches[0] && (Math.abs(e.touches[0].clientY-_galY)>5 || Math.abs(e.touches[0].clientX-_galX)>5)) _galMoved=true; }, {passive:true});
+            grid.addEventListener('touchstart', function(e){ if(e.touches[0]){ _galY=e.touches[0].clientY; _galMoved=false; } }, {passive:true});
+            grid.addEventListener('touchmove', function(e){ if(e.touches[0] && Math.abs(e.touches[0].clientY-_galY)>10) _galMoved=true; }, {passive:true});
         }
         function enterFromGallery(i) {
             var g=document.getElementById('mini-gallery'); if(g) g.style.display='none';
@@ -4928,6 +4927,10 @@
         updateModeButtons();
         // 초기 선택: 관자보 (첫 번째 폴더)
         selectFolderByInfo(KIBO_FOLDERS[0]);
+        (function(){ var pl=document.getElementById('prob-list'); if(!pl) return;
+            pl.addEventListener('mousedown', function(e){ _listDownY = e.clientY; });
+            pl.addEventListener('touchstart', function(e){ if(e.touches[0]) _listDownY = e.touches[0].clientY; }, {passive:true});
+        })();
 
         function fitBoard(){
             cellSize = computeCellSize();   // 크롭 상태 유지한 채 크기만 재계산
@@ -5058,9 +5061,9 @@
             }
             host.innerHTML='<div class="msr-head">'+(selectedFolderCol?selectedFolderCol.display:'문제')
                 +' <span>완료 '+mCountSolved()+' / '+PROBLEMS.length+'</span></div>'
-                +'<div class="msr-body"><table class="m-stat-table">'
+                +'<table class="m-stat-table">'
                 +'<thead><tr><th>번호</th><th>시도</th><th>정답</th><th>힌트</th><th>정해</th><th>분류</th></tr></thead>'
-                +'<tbody>'+rows+'</tbody></table></div>';
+                +'<tbody>'+rows+'</tbody></table>';
             var trs=host.querySelectorAll('.mst-row');
             for(var k=0;k<trs.length;k++){ (function(tr){ tr.onclick=function(){ mSolve(+tr.dataset.i); }; })(trs[k]); }
             var sub=document.getElementById('m-prob-sub'); if(sub) sub.textContent='';
