@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v3.1</title>
+    <title>고전 사활 문제풀기 v3.2</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -4553,12 +4553,17 @@
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
-                // 탭/클릭 → 선택(하이라이트) + 열기 버튼 표시
-                // 스크롤 직후 click은 _mgScrolled 플래그로 차단
-                // 더블클릭(PC) → 바로 열기
+                // 탭 → 선택, 열기 버튼으로 진입
+                // 스크롤 직후 400ms 내 click/dblclick 모두 차단
                 (function(i){
-                    cell.addEventListener('click', function(){ if(!_mgScrolled) selectCell(i); });
-                    cell.addEventListener('dblclick', function(){ enterFromGallery(i); });
+                    cell.addEventListener('click', function(){
+                        if(_mgScrolled || Date.now()-_mgLastScrollTime<400) return;
+                        selectCell(i);
+                    });
+                    cell.addEventListener('dblclick', function(){
+                        if(_mgScrolled || Date.now()-_mgLastScrollTime<400) return;
+                        enterFromGallery(i);
+                    });
                 })(idx);
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
@@ -4571,27 +4576,29 @@
         }
         var _mgSelectedIdx = -1;
         var _mgScrolled = false, _mgTouchY = 0, _mgScrollListenerBound = false;
+        var _mgLastScrollTime = 0;
         function _bindMgScrollDetect() {
             if (_mgScrollListenerBound) return;
             _mgScrollListenerBound = true;
-            // touchstart 마다 플래그 초기화
             document.addEventListener('touchstart', function(e){
-                _mgScrolled = false;
+                // 관성 스크롤 중 손가락을 대도 300ms 내면 리셋 안 함
+                if(Date.now() - _mgLastScrollTime > 300) _mgScrolled = false;
                 _mgTouchY = e.touches[0].clientY;
             }, {passive:true});
-            // 손가락 5px 이상 이동 시 스크롤로 판단
             document.addEventListener('touchmove', function(e){
                 if(Math.abs(e.touches[0].clientY - _mgTouchY) > 5) _mgScrolled = true;
             }, {passive:true});
-            // 브라우저가 스크롤 제어권을 가져갈 때
             document.addEventListener('touchcancel', function(){ _mgScrolled = true; }, {passive:true});
         }
         function _bindGridScrollEvent() {
             var grid = document.getElementById('mg-grid');
             if(!grid || grid._scrollBound) return;
             grid._scrollBound = true;
-            // 실제 그리드가 스크롤되면 무조건 플래그 세팅 — 가장 확실한 방법
-            grid.addEventListener('scroll', function(){ _mgScrolled = true; }, {passive:true});
+            // 실제 스크롤 발생 → 플래그 + 시간 기록
+            grid.addEventListener('scroll', function(){
+                _mgScrolled = true;
+                _mgLastScrollTime = Date.now();
+            }, {passive:true});
         }
         function selectCell(i) {
             _mgSelectedIdx = i;
