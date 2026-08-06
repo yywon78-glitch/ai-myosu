@@ -4545,7 +4545,17 @@
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
-                cell.onclick=function(){ if(_galMoved) return; enterFromGallery(idx); };  // 스크롤 중이면 무시
+                // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
+                (function(i){
+                    var lastTap=0;
+                    cell.addEventListener('touchend', function(e){
+                        if(_galMoved) return;
+                        var now=Date.now();
+                        if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
+                        else lastTap=now;
+                    }, {passive:false});
+                    cell.ondblclick=function(){ enterFromGallery(i); };
+                })(idx);
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
             });
