@@ -4546,16 +4546,18 @@
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
                 // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
-                (function(i){
-                    var lastTap=0;
+                // scrollTop 변화로 스크롤 여부 판단 (플래그 타이밍 문제 없음)
+                (function(i, g){
+                    var lastTap=0, startScrollY=0;
+                    cell.addEventListener('touchstart', function(){ startScrollY=g.scrollTop; }, {passive:true});
                     cell.addEventListener('touchend', function(e){
-                        if(_galMoved) return;
+                        if(Math.abs(g.scrollTop-startScrollY)>5) return;
                         var now=Date.now();
                         if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
                         else lastTap=now;
                     }, {passive:false});
                     cell.ondblclick=function(){ enterFromGallery(i); };
-                })(idx);
+                })(idx, grid);
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
             });
