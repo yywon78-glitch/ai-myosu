@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v2.7</title>
+    <title>고전 사활 문제풀기 v2.8</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -4545,8 +4545,23 @@
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
-                // 더블클릭(PC) / 더블탭(모바일) 으로만 진입 — touch 이벤트 불사용
+                // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
+                // 셀 단위로 이동거리 직접 추적 — 스크롤 중 열림 완전 차단
                 (function(i){
+                    var lastTap=0, moved=false, startX=0, startY=0;
+                    cell.addEventListener('touchstart', function(e){
+                        moved=false;
+                        startX=e.touches[0].clientX; startY=e.touches[0].clientY;
+                    }, {passive:true});
+                    cell.addEventListener('touchmove', function(e){
+                        if(Math.abs(e.touches[0].clientX-startX)>10 || Math.abs(e.touches[0].clientY-startY)>10) moved=true;
+                    }, {passive:true});
+                    cell.addEventListener('touchend', function(e){
+                        if(moved){ lastTap=0; return; }
+                        var now=Date.now();
+                        if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
+                        else lastTap=now;
+                    }, {passive:false});
                     cell.addEventListener('dblclick', function(){ enterFromGallery(i); });
                 })(idx);
                 frag.appendChild(cell);
