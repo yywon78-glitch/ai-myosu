@@ -5185,10 +5185,16 @@
             }catch(e){}
         })();
 
-        // 서비스워커 등록 → 오프라인 실행 + 홈화면 설치
+        // 서비스워커 등록 → 앱 실행 시마다 업데이트 체크, 새 버전 발견 시 자동 새로고침
         if('serviceWorker' in navigator){
             window.addEventListener('load', function(){
-                navigator.serviceWorker.register('sw.js').catch(function(){});
+                navigator.serviceWorker.register('sw.js').then(function(reg){
+                    reg.update(); // 24시간 대기 없이 즉시 업데이트 체크
+                }).catch(function(){});
+                // 새 서비스워커가 활성화되면 페이지 자동 새로고침
+                navigator.serviceWorker.addEventListener('controllerchange', function(){
+                    window.location.reload();
+                });
             });
         }
     </script>
