@@ -1,7 +1,7 @@
 /* 고전 사활 문제풀기 — 서비스워커
    HTML은 항상 서버에서 직접 가져옴 (캐시 완전 무시)
    정적 파일(아이콘 등)은 cache-first. */
-const CACHE = 'gojeon-sahwal-v27';
+const CACHE = 'gojeon-sahwal-v28';
 const ASSETS = [
   'manifest.json',
   'icon-192.png',
