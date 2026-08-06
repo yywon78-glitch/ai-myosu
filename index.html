@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v3.7</title>
+    <title>고전 사활 문제풀기 v2.4</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -580,20 +580,14 @@
         body.gallery-open #m-hamburger { display:none !important; }   /* 전체기보에선 햄버거 숨김 → ‹이전화면 사용 */
         #mg-head .mg-title { font-size:16px; font-weight:700; color:#f5e6c8; }
         #mg-head .mg-sub { font-size:12px; color:#9fb0c0; }
-        #mg-grid { flex:1 1 auto; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:14px; align-content:start; }
-        .mg-cell { display:flex; flex-direction:column; align-items:stretch; gap:0; padding:0; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:12px; cursor:pointer; transition:transform .12s,border-color .12s; overflow:hidden; }
-        .mg-cell:active { transform:scale(.97); border-color:#d4a056; }
-        .mg-cell.selected { border-color:#d4a056; background:rgba(212,160,86,0.22); box-shadow:0 0 0 2px rgba(212,160,86,0.5); }
+        #mg-grid { flex:1 1 auto; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:10px; padding:14px; align-content:start; }
+        .mg-cell { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px 5px; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:8px; cursor:pointer; transition:all .12s; }
+        .mg-cell:hover { border-color:#d4a056; background:rgba(212,160,86,0.18); transform:translateY(-2px); }
         .mg-cell.solved { border-color:rgba(46,204,113,0.5); }
-        .mg-cell.solved .mg-status { color:#2ecc71; }
-        #mg-open-btn { margin-left:auto; flex-shrink:0; padding:6px 16px; background:#d4a056; color:#1a252f; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; display:none; }
-        #mg-open-btn:active { background:#b8893a; }
-        .mg-num { font-size:13px; font-weight:700; color:#f5e6c8; padding:8px 10px 6px; }
-        .mg-board-slot { width:100%; aspect-ratio:1/1; display:block; overflow:hidden; }
-        .mg-board { width:100%; height:100%; display:block; }
-        .mg-info { padding:8px 10px 10px; text-align:left; display:flex; flex-direction:column; gap:3px; }
-        .mg-chapter { font-size:11px; font-weight:600; color:#d4a056; line-height:1.3; }
-        .mg-status { font-size:11px; color:#7a8a9a; line-height:1.3; }
+        .mg-cell.solved .mg-num { color:#2ecc71; }
+        .mg-num { font-size:12px; font-weight:700; color:#f5e6c8; }
+        .mg-board { width:96px; height:96px; background:#e8c47a; border-radius:3px; display:block; }
+        .mg-chapter { font-size:11px; font-weight:600; color:#d4a056; text-align:center; line-height:1.2; }
         .mg-nosol { font-size:9px; color:#c0392b; }
         #mg-back { position:absolute; top:8px; left:8px; z-index:21; padding:6px 12px; background:#33415a; color:#cde; border:1px solid #4a5a75; border-radius:6px; font-size:12px; cursor:pointer; display:none; }
         #mg-back:hover { background:#3f4f6d; }
@@ -685,20 +679,6 @@
         .mcc-stat:active { background:rgba(41,128,185,0.4); }
 
         /* 통계 표 (table-layout:fixed → 열 폭 균등, 화면 안에 반드시 맞춤) */
-        /* 통계 2단: 좌 문제집목록(고정) + 우 상세(스크롤) */
-        .m-stat-2pane { flex:1 1 auto; display:flex; min-height:0; }
-        #m-stat-left { flex:0 0 132px; overflow-y:auto; -webkit-overflow-scrolling:touch;
-            border-right:1px solid rgba(245,230,200,0.15); background:rgba(0,0,0,0.18); padding:8px 6px; }
-        #m-stat-right { flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 10px; }
-        .msl-col { padding:9px 8px; margin-bottom:6px; border-radius:8px; cursor:pointer;
-            border:1px solid rgba(245,230,200,0.12); background:rgba(0,0,0,0.25); -webkit-tap-highlight-color:transparent; }
-        .msl-col.sel { border-color:#d4a056; background:rgba(212,160,86,0.25); }
-        .msl-col:active { background:rgba(212,160,86,0.18); }
-        .msl-name { font-size:14px; font-weight:700; color:#f5e6c8; }
-        .msl-cnt { font-size:12px; color:#9fb0c0; margin-top:3px; }
-        .msl-cnt b { color:#2ecc71; font-size:14px; }
-        .msr-head { font-size:15px; font-weight:800; color:#f5d78a; padding:2px 2px 10px; }
-        .msr-head span { font-size:12px; color:#7fe0c4; font-weight:600; margin-left:6px; }
         .m-stat-table { width:100%; border-collapse:collapse; table-layout:fixed; }
         .m-stat-table th { position:sticky; top:0; background:#243342; color:#d4a056;
             font-size:13px; font-weight:700; padding:11px 4px; border-bottom:2px solid rgba(245,230,200,0.25); }
@@ -818,17 +798,14 @@
         <section id="m-scr-prob" class="m-scr" hidden>
             <div class="m-head">
                 <button class="m-back" onclick="mShowCollections()" aria-label="문제집으로">‹</button>
-                <span class="m-title" id="m-prob-title">통계</span>
+                <span class="m-title" id="m-prob-title">문제</span>
                 <span class="m-sub" id="m-prob-sub"></span>
             </div>
-            <div class="m-stat-2pane">
-                <div id="m-stat-left"></div>
-                <div id="m-stat-right"></div>
-            </div>
+            <div id="m-prob-list" class="m-body"></div>
         </section>
     </div>
     <div class="side-panel">
-        <h1 style="font-size:19px;letter-spacing:1px;">고전 사활 문제풀기 v2.5</h1>
+        <h1 style="font-size:19px;letter-spacing:1px;">고전 사활 문제풀기 v2.4</h1>
 
         <div style="font-size:16px;color:#e8dcc0;text-align:center;font-weight:600;margin:2px 0 4px;">완료 <b id="solved-count" style="color:#2ecc71;font-size:24px;">0</b> <span style="font-size:14px;color:#9aa;">/ <span id="total-count">347</span></span></div>
 
@@ -932,7 +909,6 @@
                 <button id="mg-tocoll" onclick="mShowCollections()" aria-label="이전화면">‹ 이전화면</button>
                 <span class="mg-title" id="mg-coll-name">문제</span>
                 <span class="mg-sub" id="mg-count"></span>
-                <button id="mg-open-btn" onclick="openSelectedCell()">열기 ▶</button>
             </div>
             <div id="mg-grid"></div>
         </div>
@@ -4267,7 +4243,6 @@
         let progress = (function(){ try { return JSON.parse(localStorage.getItem('hh_prog_'+collection)||'{}'); } catch(e){ return {}; } })();
         function saveProgress(){ try { localStorage.setItem('hh_prog_'+collection, JSON.stringify(progress)); } catch(e){} }
         var _rowEls = [];   // 행 DOM 캐시 (증분 갱신용)
-        var _listDownY = 0; // 스크롤 vs 클릭 판별용
         function buildList(){
             var tb = document.getElementById('prob-tbody'); if(!tb) return; tb.innerHTML='';
             _rowEls = [];
@@ -4285,7 +4260,7 @@
                 tr.appendChild(td(p.sol.length));
                 tr.appendChild(td(st.tries||0));
                 tr.appendChild(td(st.solves||0, st.solves?'pl-ok':''));
-                tr.onclick=function(e){ if(Math.abs(e.clientY-_listDownY)>5) return; loadProblem(i); };
+                tr.onclick=function(){ loadProblem(i); };
                 _rowEls[i]=tr;
                 frag.appendChild(tr);
             })(i); }
@@ -4499,9 +4474,8 @@
             var cols=x1-x0+1, rows=y1-y0+1;
             var cell=12, pad=cell/2;
             var W=cols*cell, H=rows*cell;
-            var sq=Math.max(W,H), ox=(sq-W)/2, oy=(sq-H)/2;
-            var svg='<svg class="mg-board" viewBox="'+(-ox)+' '+(-oy)+' '+sq+' '+sq+'">';
-            svg+='<rect x="'+(-ox)+'" y="'+(-oy)+'" width="'+sq+'" height="'+sq+'" fill="#e8c47a"/>';
+            var svg='<svg class="mg-board" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">';
+            svg+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#e8c47a"/>';
             // 격자선 (반칸 여백 안쪽). 판 가장자리에 닿으면 굵게.
             for(var gx=x0; gx<=x1; gx++){
                 var px=pad+(gx-x0)*cell;
@@ -4525,8 +4499,6 @@
         var _mgObserver=null;
         function showGallery() {
             var g=document.getElementById('mini-gallery'); if(!g) return;
-            _mgSelectedIdx = -1;
-            var btn=document.getElementById('mg-open-btn'); if(btn) btn.style.display='none';
             document.getElementById('mg-coll-name').textContent = selectedFolderCol ? (selectedFolderCol.display||'문제') : '문제';
             document.getElementById('mg-count').textContent = PROBLEMS.length ? (PROBLEMS.length+'문제 — 문제를 선택하세요') : '';
             var grid=document.getElementById('mg-grid'); grid.innerHTML='';
@@ -4542,10 +4514,6 @@
                     _mgObserver.unobserve(cell);
                 });
             }, { root:grid, rootMargin:'200px' });
-            // 스크롤 감지: touchmove > 10px 이상이면 탭 무시 (기보보기와 동일 방식)
-            var _mgScrolled=false, _mgTY=0;
-            grid.addEventListener('touchstart', function(e){ if(e.touches[0]){ _mgTY=e.touches[0].clientY; _mgScrolled=false; } }, {passive:true});
-            grid.addEventListener('touchmove', function(e){ if(e.touches[0] && Math.abs(e.touches[0].clientY-_mgTY)>10) _mgScrolled=true; }, {passive:true});
             // 번호(n)순 정렬해 표시 — 클릭은 원본 인덱스로 진입 (장 구분이 순서대로 묶임)
             var order=PROBLEMS.map(function(_,idx){return idx;}).sort(function(a,b){return (PROBLEMS[a].n||0)-(PROBLEMS[b].n||0);});
             var frag=document.createDocumentFragment();
@@ -4556,38 +4524,26 @@
                 cell.dataset.idx=idx;
                 var ch=chapterLabel(p);
                 var nosol=(!p.sol||p.sol.length===0)?'<span class="mg-nosol">정해없음</span>':'';
-                var solved=st.solved?'✅ 풀었음':'미풀이';
-                cell.innerHTML='<div class="mg-board-slot"></div>'
-                    +'<div class="mg-info">'
-                    +'<div class="mg-num">'+p.n+'번 '+nosol+'</div>'
-                    +'<div class="mg-chapter">'+(ch||'&nbsp;')+'</div>'
-                    +'<div class="mg-status">'+solved+'</div>'
-                    +'</div>';
-                // 기보보기와 동일: 탭하면 바로 열기, 스크롤 중이면 무시
-                (function(i){ cell.onclick = function(){ if(_mgScrolled) return; enterFromGallery(i); }; })(idx);
+                cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
+                    +'<div class="mg-board-slot"></div>'
+                    +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
+                cell.onclick=function(){ if(_galMoved) return; enterFromGallery(idx); };  // 스크롤 중이면 무시
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
             });
             grid.appendChild(frag);
+            bindGalleryScroll(grid);      // 스크롤 vs 탭 구분(1회 바인딩)
             g.style.display='flex';
             document.body.classList.add('gallery-open');   // 햄버거 숨김
             document.getElementById('mg-back').style.display='none';
             var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
         }
-        var _mgSelectedIdx = -1;
-        function selectCell(i) {
-            _mgSelectedIdx = i;
-            var grid = document.getElementById('mg-grid');
-            if(!grid) return;
-            grid.querySelectorAll('.mg-cell').forEach(function(c){ c.classList.remove('selected'); });
-            var target = grid.querySelector('[data-idx="'+i+'"]');
-            if(target) target.classList.add('selected');
-            var btn = document.getElementById('mg-open-btn');
-            if(btn) btn.style.display = 'block';
-        }
-        function openSelectedCell() {
-            if(_mgSelectedIdx < 0) return;
-            enterFromGallery(_mgSelectedIdx);
+        // 갤러리 스크롤 감지: 손가락이 움직이면(스크롤) 셀 선택 억제
+        var _galMoved=false, _galY=0, _galScrollBound=false;
+        function bindGalleryScroll(grid){
+            if(_galScrollBound || !grid) return; _galScrollBound=true;
+            grid.addEventListener('touchstart', function(e){ if(e.touches[0]){ _galY=e.touches[0].clientY; _galMoved=false; } }, {passive:true});
+            grid.addEventListener('touchmove', function(e){ if(e.touches[0] && Math.abs(e.touches[0].clientY-_galY)>10) _galMoved=true; }, {passive:true});
         }
         function enterFromGallery(i) {
             var g=document.getElementById('mini-gallery'); if(g) g.style.display='none';
@@ -4953,10 +4909,6 @@
         updateModeButtons();
         // 초기 선택: 관자보 (첫 번째 폴더)
         selectFolderByInfo(KIBO_FOLDERS[0]);
-        (function(){ var pl=document.getElementById('prob-list'); if(!pl) return;
-            pl.addEventListener('mousedown', function(e){ _listDownY = e.clientY; });
-            pl.addEventListener('touchstart', function(e){ if(e.touches[0]) _listDownY = e.touches[0].clientY; }, {passive:true});
-        })();
 
         function fitBoard(){
             cellSize = computeCellSize();   // 크롭 상태 유지한 채 크기만 재계산
@@ -5035,39 +4987,12 @@
         // 통계(표): 번호·시도·정답·힌트·정해 — 행 탭 → 풀기
         function mStats(info){
             if(info) selectFolderByInfo(info);
-            document.getElementById('m-prob-title').textContent='통계';
-            mRenderStatLeft();      // 좌: 문제집별 요약
-            mRenderStats();         // 우: 선택 문제집 상세
+            document.getElementById('m-prob-title').textContent=(selectedFolderCol?selectedFolderCol.display:'문제')+' · 통계';
+            mRenderStats();
             mScreen('m-scr-prob'); mOpenNav();
         }
-        // 좌측: 문제집별 요약 (명/문제수/완료수) — 항상 보임, 선택 시 우측 갱신
-        function mRenderStatLeft(){
-            var host=document.getElementById('m-stat-left'); if(!host) return;
-            var html='';
-            KIBO_FOLDERS.forEach(function(info){
-                var s=getFolderStats(info.id);
-                var sel = selectedFolderCol && selectedFolderCol.id===info.id;
-                html+='<div class="msl-col'+(sel?' sel':'')+'" data-id="'+info.id+'">'
-                    +'<div class="msl-name">'+info.display+'</div>'
-                    +'<div class="msl-cnt"><b>'+s.solved+'</b> / '+info.count+'</div>'
-                    +'</div>';
-            });
-            host.innerHTML=html;
-            var cols=host.querySelectorAll('.msl-col');
-            for(var k=0;k<cols.length;k++){ (function(el){
-                el.onclick=function(){
-                    var info=KIBO_FOLDERS.filter(function(f){return f.id===el.dataset.id;})[0];
-                    if(info) mStatSelect(info);
-                };
-            })(cols[k]); }
-        }
-        function mStatSelect(info){
-            selectFolderByInfo(info);
-            mRenderStatLeft();      // 선택 하이라이트 갱신
-            mRenderStats();         // 우측 상세 갱신
-        }
         function mRenderStats(){
-            var host=document.getElementById('m-stat-right'); if(!host) return;
+            var host=document.getElementById('m-prob-list'); if(!host) return;
             var refC=REF[collection]||{};
             var rows='';
             for(var i=0;i<PROBLEMS.length;i++){
@@ -5085,14 +5010,12 @@
                     +'<td>'+refCell+'</td>'
                   +'</tr>';
             }
-            host.innerHTML='<div class="msr-head">'+(selectedFolderCol?selectedFolderCol.display:'문제')
-                +' <span>완료 '+mCountSolved()+' / '+PROBLEMS.length+'</span></div>'
-                +'<table class="m-stat-table">'
+            host.innerHTML='<table class="m-stat-table">'
                 +'<thead><tr><th>번호</th><th>시도</th><th>정답</th><th>힌트</th><th>정해</th><th>분류</th></tr></thead>'
                 +'<tbody>'+rows+'</tbody></table>';
             var trs=host.querySelectorAll('.mst-row');
             for(var k=0;k<trs.length;k++){ (function(tr){ tr.onclick=function(){ mSolve(+tr.dataset.i); }; })(trs[k]); }
-            var sub=document.getElementById('m-prob-sub'); if(sub) sub.textContent='';
+            var sub=document.getElementById('m-prob-sub'); if(sub) sub.textContent='완료 '+mCountSolved()+' / '+PROBLEMS.length;
         }
 
         // 전체기보: 미니 갤러리(원래 모양). 탭 → 문제(풀기)
@@ -5185,22 +5108,10 @@
             }catch(e){}
         })();
 
-        // 서비스워커: 기존 것 모두 제거 후 새로 등록 → 캐시 악순환 차단
+        // 서비스워커 등록 → 오프라인 실행 + 홈화면 설치
         if('serviceWorker' in navigator){
             window.addEventListener('load', function(){
-                // 기존 서비스워커 전부 unregister (구버전 캐시 완전 제거)
-                navigator.serviceWorker.getRegistrations().then(function(registrations){
-                    return Promise.all(registrations.map(function(r){ return r.unregister(); }));
-                }).then(function(){
-                    // 새 서비스워커 등록
-                    return navigator.serviceWorker.register('sw.js');
-                }).then(function(reg){
-                    reg.update();
-                }).catch(function(){});
-                // 새 서비스워커 활성화 시 자동 새로고침
-                navigator.serviceWorker.addEventListener('controllerchange', function(){
-                    window.location.reload();
-                });
+                navigator.serviceWorker.register('sw.js').catch(function(){});
             });
         }
     </script>
