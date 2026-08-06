@@ -1,7 +1,7 @@
 /* 고전 사활 문제풀기 — 서비스워커
    HTML(index.html)은 network-first: 온라인이면 항상 최신 버전 자동 반영,
    오프라인이면 캐시로 폴백. 정적 파일(아이콘 등)은 cache-first. */
-const CACHE = 'gojeon-sahwal-v19';
+const CACHE = 'gojeon-sahwal-v20';
 const ASSETS = [
   '.',
   'index.html',
