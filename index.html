@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v3.6</title>
+    <title>고전 사활 문제풀기 v3.7</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -5185,13 +5185,19 @@
             }catch(e){}
         })();
 
-        // 서비스워커 등록 → 앱 실행 시마다 업데이트 체크, 새 버전 발견 시 자동 새로고침
+        // 서비스워커: 기존 것 모두 제거 후 새로 등록 → 캐시 악순환 차단
         if('serviceWorker' in navigator){
             window.addEventListener('load', function(){
-                navigator.serviceWorker.register('sw.js').then(function(reg){
-                    reg.update(); // 24시간 대기 없이 즉시 업데이트 체크
+                // 기존 서비스워커 전부 unregister (구버전 캐시 완전 제거)
+                navigator.serviceWorker.getRegistrations().then(function(registrations){
+                    return Promise.all(registrations.map(function(r){ return r.unregister(); }));
+                }).then(function(){
+                    // 새 서비스워커 등록
+                    return navigator.serviceWorker.register('sw.js');
+                }).then(function(reg){
+                    reg.update();
                 }).catch(function(){});
-                // 새 서비스워커가 활성화되면 페이지 자동 새로고침
+                // 새 서비스워커 활성화 시 자동 새로고침
                 navigator.serviceWorker.addEventListener('controllerchange', function(){
                     window.location.reload();
                 });
