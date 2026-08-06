@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전 사활 문제풀기 v2.8</title>
+    <title>고전 사활 문제풀기 v2.9</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -581,9 +581,12 @@
         #mg-head .mg-title { font-size:16px; font-weight:700; color:#f5e6c8; }
         #mg-head .mg-sub { font-size:12px; color:#9fb0c0; }
         #mg-grid { flex:1 1 auto; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:10px; padding:14px; align-content:start; }
-        .mg-cell { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px 5px; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:8px; cursor:pointer; transition:all .12s; touch-action:manipulation; }
+        .mg-cell { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 4px 5px; background:rgba(0,0,0,0.28); border:1px solid rgba(245,230,200,0.12); border-radius:8px; cursor:pointer; transition:all .12s; }
         .mg-cell:hover { border-color:#d4a056; background:rgba(212,160,86,0.18); transform:translateY(-2px); }
+        .mg-cell.selected { border-color:#d4a056; background:rgba(212,160,86,0.22); box-shadow:0 0 0 2px rgba(212,160,86,0.5); }
         .mg-cell.solved { border-color:rgba(46,204,113,0.5); }
+        #mg-open-btn { margin-left:auto; flex-shrink:0; padding:6px 16px; background:#d4a056; color:#1a252f; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; display:none; }
+        #mg-open-btn:active { background:#b8893a; }
         .mg-cell.solved .mg-num { color:#2ecc71; }
         .mg-num { font-size:12px; font-weight:700; color:#f5e6c8; }
         .mg-board { width:96px; height:96px; background:#e8c47a; border-radius:3px; display:block; }
@@ -926,6 +929,7 @@
                 <button id="mg-tocoll" onclick="mShowCollections()" aria-label="이전화면">‹ 이전화면</button>
                 <span class="mg-title" id="mg-coll-name">문제</span>
                 <span class="mg-sub" id="mg-count"></span>
+                <button id="mg-open-btn" onclick="openSelectedCell()">열기 ▶</button>
             </div>
             <div id="mg-grid"></div>
         </div>
@@ -4517,6 +4521,8 @@
         var _mgObserver=null;
         function showGallery() {
             var g=document.getElementById('mini-gallery'); if(!g) return;
+            _mgSelectedIdx = -1;
+            var btn=document.getElementById('mg-open-btn'); if(btn) btn.style.display='none';
             document.getElementById('mg-coll-name').textContent = selectedFolderCol ? (selectedFolderCol.display||'문제') : '문제';
             document.getElementById('mg-count').textContent = PROBLEMS.length ? (PROBLEMS.length+'문제 — 문제를 선택하세요') : '';
             var grid=document.getElementById('mg-grid'); grid.innerHTML='';
@@ -4545,23 +4551,10 @@
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>';
-                // 더블탭(모바일) / 더블클릭(PC) 으로만 진입
-                // 셀 단위로 이동거리 직접 추적 — 스크롤 중 열림 완전 차단
+                // 탭/클릭 → 선택(하이라이트) + 열기 버튼 표시
+                // 더블클릭(PC) → 바로 열기
                 (function(i){
-                    var lastTap=0, moved=false, startX=0, startY=0;
-                    cell.addEventListener('touchstart', function(e){
-                        moved=false;
-                        startX=e.touches[0].clientX; startY=e.touches[0].clientY;
-                    }, {passive:true});
-                    cell.addEventListener('touchmove', function(e){
-                        if(Math.abs(e.touches[0].clientX-startX)>10 || Math.abs(e.touches[0].clientY-startY)>10) moved=true;
-                    }, {passive:true});
-                    cell.addEventListener('touchend', function(e){
-                        if(moved){ lastTap=0; return; }
-                        var now=Date.now();
-                        if(now-lastTap<350){ e.preventDefault(); enterFromGallery(i); lastTap=0; }
-                        else lastTap=now;
-                    }, {passive:false});
+                    cell.addEventListener('click', function(){ selectCell(i); });
                     cell.addEventListener('dblclick', function(){ enterFromGallery(i); });
                 })(idx);
                 frag.appendChild(cell);
@@ -4572,6 +4565,21 @@
             document.body.classList.add('gallery-open');   // 햄버거 숨김
             document.getElementById('mg-back').style.display='none';
             var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
+        }
+        var _mgSelectedIdx = -1;
+        function selectCell(i) {
+            _mgSelectedIdx = i;
+            var grid = document.getElementById('mg-grid');
+            if(!grid) return;
+            grid.querySelectorAll('.mg-cell').forEach(function(c){ c.classList.remove('selected'); });
+            var target = grid.querySelector('[data-idx="'+i+'"]');
+            if(target) target.classList.add('selected');
+            var btn = document.getElementById('mg-open-btn');
+            if(btn) btn.style.display = 'block';
+        }
+        function openSelectedCell() {
+            if(_mgSelectedIdx < 0) return;
+            enterFromGallery(_mgSelectedIdx);
         }
         function enterFromGallery(i) {
             var g=document.getElementById('mini-gallery'); if(g) g.style.display='none';
