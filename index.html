@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.8</title>
+    <title>고전사활문제집 v3.9</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -818,10 +818,10 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.8</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.9</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
-                <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">유형</button>
+                <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
             </div>
             <div id="m-coll-list" class="m-body"></div>
             <div id="m-type-list" class="m-body" style="display:none"></div>
@@ -5045,73 +5045,81 @@
             document.getElementById('tab-type').classList.toggle('active', tab==='type');
             document.getElementById('m-coll-list').style.display = tab==='coll' ? '' : 'none';
             document.getElementById('m-type-list').style.display = tab==='type' ? '' : 'none';
-            if(tab==='type') renderTypeList();
+            if(tab==='type') renderPosList();
         }
 
-        // desc에서 유형 추출
-        function getTypeLabel(p) {
-            var parts = (p.desc||'').split('·').map(function(s){return s.trim();});
-            for(var i=0;i<parts.length;i++){
-                var w = parts[i].replace(/^(흑선|백선|흑 선|백 선)\s*/,'')
-                    .replace('삶','활').replace('죽음','사').replace('잡음','사').replace('잡기','사');
-                if(/^(활|사|패|빅|연결|절단|득)$/.test(w)) return w;
-            }
-            return '기타';
+        // 귀/변/중앙 판별 — 돌들의 경계가 가장자리 3선 이내면 귀/변
+        function getPositionLabel(p) {
+            var stones = (p.ab||[]).concat(p.aw||[]);
+            if(!stones.length) return '중앙';
+            var xs = stones.map(function(c){ return c.charCodeAt(0)-97; });
+            var ys = stones.map(function(c){ return c.charCodeAt(1)-97; });
+            var minX=Math.min.apply(null,xs), maxX=Math.max.apply(null,xs);
+            var minY=Math.min.apply(null,ys), maxY=Math.max.apply(null,ys);
+            var onLeft=minX<=2, onRight=maxX>=16, onTop=minY<=2, onBottom=maxY>=16;
+            if((onLeft||onRight)&&(onTop||onBottom)) return '귀';
+            if(onLeft||onRight||onTop||onBottom) return '변';
+            return '중앙';
         }
 
-        // 전체 내장 문제 + 폴더 정보
+        // 전체 내장 문제 + 폴더 정보 (정해있는 것만)
         function getAllBuiltinItems() {
             var builtinMap = {hh:PROBLEMS_HH, gj:PROBLEMS_GJ, kj:PROBLEMS_KJ, by:PROBLEMS_BY};
             var all = [];
             KIBO_FOLDERS.forEach(function(folder){
                 if(!folder.builtin || !builtinMap[folder.builtin]) return;
-                builtinMap[folder.builtin].forEach(function(p){ all.push({p:p, folder:folder}); });
+                builtinMap[folder.builtin].forEach(function(p){
+                    if(p.sol && p.sol.length) all.push({p:p, folder:folder});
+                });
             });
             return all;
         }
 
-        // 유형별 카드 렌더링
-        function renderTypeList() {
+        // 귀/변/중앙 카드 렌더링
+        function renderPosList() {
             var host = document.getElementById('m-type-list');
             host.innerHTML = '';
             var allItems = getAllBuiltinItems();
-            var typeMap = {};
+            var posMap = {};
             allItems.forEach(function(item){
-                var type = getTypeLabel(item.p);
-                if(!typeMap[type]) typeMap[type] = [];
-                typeMap[type].push(item);
+                var pos = getPositionLabel(item.p);
+                if(!posMap[pos]) posMap[pos] = [];
+                posMap[pos].push(item);
             });
-            var typeOrder = ['활','사','패','빅','연결','절단','득','기타'];
-            var typeColors = {활:'#2e7d4e',사:'#7d2e2e',패:'#7d6b2e',빅:'#2e5a7d',연결:'#5a2e7d',절단:'#7d4a2e',득:'#2e7d6b',기타:'#4a4a5a'};
-            var typeDesc = {활:'돌을 살리는 문제',사:'돌을 잡는 문제',패:'패로 해결하는 문제',빅:'빅으로 해결하는 문제',연결:'돌을 연결하는 문제',절단:'상대 돌을 끊는 문제',득:'집을 얻는 문제',기타:'기타 유형의 문제'};
-            typeOrder.forEach(function(type){
-                var items = typeMap[type];
+            var posOrder = ['귀','변','중앙'];
+            var posColors = {귀:'#7d4a2e', 변:'#2e5a7d', 중앙:'#2e7d4e'};
+            var posDesc = {귀:'귀에서 펼쳐지는 사활', 변:'변에서 펼쳐지는 사활', 중앙:'중앙에서 펼쳐지는 사활'};
+            var posSym = {귀:'귀', 변:'변', 중앙:'央'};
+            posOrder.forEach(function(pos){
+                var items = posMap[pos];
                 if(!items || !items.length) return;
                 var total = items.length;
-                var hasSol = items.filter(function(it){ return it.p.sol && it.p.sol.length; }).length;
-                var noSol = total - hasSol;
-                var pct = total ? Math.round(hasSol/total*100) : 0;
+                // 진행률: solved
+                var solved = items.filter(function(it){
+                    var pg = {}; try{pg=JSON.parse(localStorage.getItem('hh_prog_folder_'+it.folder.id)||'{}')}catch(e){}
+                    return pg[it.p.n] && pg[it.p.n].solved;
+                }).length;
+                var pct = total ? Math.round(solved/total*100) : 0;
                 var card = document.createElement('div');
                 card.className = 'm-coll-card';
                 card.innerHTML = '<div class="mcc-top">'
-                    +'<div class="mcc-sym" style="background:'+typeColors[type]+';font-size:20px;letter-spacing:0;">'+type+'</div>'
+                    +'<div class="mcc-sym" style="background:'+posColors[pos]+';">'+posSym[pos]+'</div>'
                     +'<div class="mcc-title">'
-                    +'<div class="mc-name">'+type+'</div>'
-                    +'<div class="mc-desc">'+typeDesc[type]+'</div>'
+                    +'<div class="mc-name">'+pos+' 사활</div>'
+                    +'<div class="mc-desc">'+posDesc[pos]+'</div>'
                     +'</div></div>'
-                    +'<div class="mc-stat">전체 <b>'+total+'</b>문제 · 정해 '+hasSol+'개'
-                    +(noSol?' · <span style="color:#e74c3c;">미등록 '+noSol+'</span>':'')+'</div>'
+                    +'<div class="mc-stat">완료 <b>'+solved+'</b> / '+total+'</div>'
                     +'<div class="mc-bar"><i style="width:'+pct+'%"></i></div>'
                     +'<div class="mcc-foot"><span class="mcc-hint">눌러서 썸네일 열기 ▶</span></div>';
-                (function(t,its){ card.onclick=function(){ showTypeGallery(t,its); }; })(type,items);
+                (function(pos2,its){ card.onclick=function(){ showPosGallery(pos2,its); }; })(pos,items);
                 host.appendChild(card);
             });
         }
 
-        // 유형별 썸네일 갤러리
-        function showTypeGallery(type, items) {
+        // 위치별 썸네일 갤러리
+        function showPosGallery(pos, items) {
             var g = document.getElementById('mini-gallery'); if(!g) return;
-            document.getElementById('mg-coll-name').textContent = type+'형 ('+items.length+'문제)';
+            document.getElementById('mg-coll-name').textContent = pos+' 사활 ('+items.length+'문제)';
             document.getElementById('mg-count').textContent = '';
             var grid = document.getElementById('mg-grid'); grid.innerHTML = '';
             if(_mgObserver){ _mgObserver.disconnect(); }
@@ -5128,14 +5136,13 @@
             }, {root:grid, rootMargin:'200px'});
             var frag = document.createDocumentFragment();
             items.forEach(function(item, idx){
-                var p=item.p, hasSol=p.sol&&p.sol.length;
+                var p=item.p;
                 var cell = document.createElement('div');
-                cell.className = 'mg-cell'+(hasSol?'':' nosol-cell');
+                cell.className = 'mg-cell';
                 cell.dataset.idx = idx;
                 cell.innerHTML = '<div class="mg-board-slot"></div>'
                     +'<div class="mg-info">'
-                    +'<div class="mg-num">'+item.folder.sym+' '+p.n+'번'
-                    +(hasSol?'':' <span class="mg-nosol">정해없음</span>')+'</div>'
+                    +'<div class="mg-num">'+item.folder.sym+' '+p.n+'번</div>'
                     +'<div class="mg-chapter">'+item.folder.display+'</div>'
                     +'</div>';
                 (function(it){ cell.onclick=function(){
