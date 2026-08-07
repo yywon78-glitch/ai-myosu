@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.5</title>
+    <title>고전사활문제집 v3.6</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -811,7 +811,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.5</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.6</span></div>
             <div id="m-coll-list" class="m-body"></div>
         </section>
         <section id="m-scr-prob" class="m-scr" hidden>
@@ -5127,6 +5127,9 @@
             var sx=0, sy=0, tracking=false;
             area.addEventListener('touchstart', function(e){
                 if(e.touches.length !== 1){ tracking=false; return; }
+                // 갤러리가 열려있으면 board-area 스와이프 완전 차단
+                var gal=document.getElementById('mini-gallery');
+                if(gal && gal.style.display!=='none'){ tracking=false; return; }
                 var t=e.touches[0]; sx=t.clientX; sy=t.clientY; tracking=true;
             }, {passive:true});
             area.addEventListener('touchend', function(e){
