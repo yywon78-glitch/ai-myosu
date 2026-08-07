@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.4</title>
+    <title>고전사활문제집 v3.5</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -811,7 +811,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.4</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.5</span></div>
             <div id="m-coll-list" class="m-body"></div>
         </section>
         <section id="m-scr-prob" class="m-scr" hidden>
@@ -4524,14 +4524,9 @@
         function showGallery() {
             var g=document.getElementById('mini-gallery'); if(!g) return;
             _mgSelectedIdx = -1;
-            var btn=document.getElementById('mg-open-btn'); if(btn) btn.style.display='none';
             document.getElementById('mg-coll-name').textContent = selectedFolderCol ? (selectedFolderCol.display||'문제') : '문제';
-            document.getElementById('mg-count').textContent = PROBLEMS.length ? (PROBLEMS.length+'문제 — 문제를 선택하세요') : '';
+            document.getElementById('mg-count').textContent = PROBLEMS.length ? (PROBLEMS.length+'문제') : '';
             var grid=document.getElementById('mg-grid'); grid.innerHTML='';
-            // 스크롤 감지: 기보보기와 동일하게 스크롤 중 탭 차단
-            var _scrolled=false, _touchY=0;
-            grid.addEventListener('touchstart', function(e){ _touchY=e.touches[0].clientY; _scrolled=false; }, {passive:true});
-            grid.addEventListener('touchmove', function(e){ if(Math.abs(e.touches[0].clientY-_touchY)>8) _scrolled=true; }, {passive:true});
             if(_mgObserver){ _mgObserver.disconnect(); }
             _mgObserver=new IntersectionObserver(function(entries){
                 entries.forEach(function(en){
@@ -4561,8 +4556,8 @@
                     +'<div class="mg-chapter">'+(ch||'&nbsp;')+' '+nosol+'</div>'
                     +'<div class="mg-status">'+solved+'</div>'
                     +'</div>';
-                // 기보보기와 동일: 스크롤 중이면 무시, 탭하면 바로 열기
-                (function(i){ cell.onclick = function(){ if(_scrolled) return; enterFromGallery(i); }; })(idx);
+                // 기보보기와 동일: 탭하면 바로 열기
+                (function(i){ cell.onclick = function(){ enterFromGallery(i); }; })(idx);
                 frag.appendChild(cell);
                 _mgObserver.observe(cell);
             });
