@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.9</title>
+    <title>고전사활문제집 v4.0</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -818,7 +818,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.9</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.0</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -3255,6 +3255,8 @@
 
         // 문제 위치(배치)로 원위치 — 내가 둔 돌 지우고 다시 풀기 상태로
         function resetToProblem() {
+            // 초기화 시 수동→자동 전환
+            if(answerMode==='manual'){ answerMode='auto'; try{localStorage.setItem('hh_mode','auto');}catch(e){} updateModeButtons(); }
             // 상태·배지는 가드보다 먼저 복원 → 정답완료/오답 어느 경우든 '정해 진행 중'으로 되살림
             solveDone = false; aiRespondMode = false; _pendingAI = false; aiCandidates = []; freeAfterWrong = false; hintMove = null;
             if (!reviewMode || !reviewSetupBoard) { updateSolveStatus(); return; }
@@ -4332,9 +4334,11 @@
         function xy2(s){ return { x:s.charCodeAt(0)-97, y:s.charCodeAt(1)-97 }; }
         function loadProblem(i){
             if(i<0||i>=PROBLEMS.length) return;
-            // v2.4: 미니 갤러리가 떠 있으면 닫고 보드로 진입
+            // 미니 갤러리가 떠 있으면 닫고 보드로 진입
             var _mg=document.getElementById('mini-gallery');
             if(_mg && _mg.style.display!=='none'){ _mg.style.display='none'; var _bk=document.getElementById('mg-back'); if(_bk) _bk.style.display=''; }
+            // 수동 모드 상태에서 새 문제 진입 시 자동으로 전환
+            if(answerMode==='manual'){ answerMode='auto'; try{localStorage.setItem('hh_mode','auto');}catch(e){} updateModeButtons(); }
             curProblem=i; triedThisAttempt=false; autoResponding=false; solveDone=false; aiRespondMode=false; _pendingAI=false; aiCandidates=[]; freeAfterWrong=false; hintMove=null; var p=PROBLEMS[i];
             var setup=[];
             p.ab.forEach(function(c){ var q=xy2(c); setup.push({player:'black',x:q.x,y:q.y}); });
