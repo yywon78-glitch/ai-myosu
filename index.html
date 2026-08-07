@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.6</title>
+    <title>고전사활문제집 v3.7</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -640,6 +640,13 @@
         .m-body { flex:1 1 auto; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
             padding:12px; padding-bottom:calc(env(safe-area-inset-bottom) + 20px); }
 
+        /* 탭바 */
+        .m-tab-bar { display:flex; flex:0 0 auto; border-bottom:2px solid rgba(245,230,200,0.12); }
+        .m-tab-btn { flex:1; padding:10px 0; font-size:14px; font-weight:600; color:rgba(245,230,200,0.4); background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; cursor:pointer; }
+        .m-tab-btn.active { color:#f5e6c8; border-bottom-color:#d4a056; }
+        /* 정해없음 셀 */
+        .mg-cell.nosol-cell { border-color:rgba(231,76,60,0.45); }
+
         /* 문제집 카드 */
         .m-coll-card { background:rgba(0,0,0,0.32); border:1px solid rgba(245,230,200,0.14);
             border-radius:12px; padding:16px 16px 14px; margin-bottom:12px; cursor:pointer; }
@@ -811,8 +818,13 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.6</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.7</span></div>
+            <div class="m-tab-bar">
+                <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
+                <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">유형</button>
+            </div>
             <div id="m-coll-list" class="m-body"></div>
+            <div id="m-type-list" class="m-body" style="display:none"></div>
         </section>
         <section id="m-scr-prob" class="m-scr" hidden>
             <div class="m-head">
@@ -5023,6 +5035,118 @@
                 host.appendChild(card);
             });
         }
+        // ── 탭 전환 ──
+        function switchTab(tab) {
+            document.getElementById('tab-coll').classList.toggle('active', tab==='coll');
+            document.getElementById('tab-type').classList.toggle('active', tab==='type');
+            document.getElementById('m-coll-list').style.display = tab==='coll' ? '' : 'none';
+            document.getElementById('m-type-list').style.display = tab==='type' ? '' : 'none';
+            if(tab==='type') renderTypeList();
+        }
+
+        // desc에서 유형 추출
+        function getTypeLabel(p) {
+            var parts = (p.desc||'').split('·').map(function(s){return s.trim();});
+            for(var i=0;i<parts.length;i++){
+                var w = parts[i].replace(/^(흑선|백선|흑 선|백 선)\s*/,'')
+                    .replace('삶','활').replace('죽음','사').replace('잡음','사').replace('잡기','사');
+                if(/^(활|사|패|빅|연결|절단|득)$/.test(w)) return w;
+            }
+            return '기타';
+        }
+
+        // 전체 내장 문제 + 폴더 정보
+        function getAllBuiltinItems() {
+            var builtinMap = {hh:PROBLEMS_HH, gj:PROBLEMS_GJ, kj:PROBLEMS_KJ, by:PROBLEMS_BY};
+            var all = [];
+            KIBO_FOLDERS.forEach(function(folder){
+                if(!folder.builtin || !builtinMap[folder.builtin]) return;
+                builtinMap[folder.builtin].forEach(function(p){ all.push({p:p, folder:folder}); });
+            });
+            return all;
+        }
+
+        // 유형별 카드 렌더링
+        function renderTypeList() {
+            var host = document.getElementById('m-type-list');
+            host.innerHTML = '';
+            var allItems = getAllBuiltinItems();
+            var typeMap = {};
+            allItems.forEach(function(item){
+                var type = getTypeLabel(item.p);
+                if(!typeMap[type]) typeMap[type] = [];
+                typeMap[type].push(item);
+            });
+            var typeOrder = ['활','사','패','빅','연결','절단','득','기타'];
+            var typeColors = {활:'#2e7d4e',사:'#7d2e2e',패:'#7d6b2e',빅:'#2e5a7d',연결:'#5a2e7d',절단:'#7d4a2e',득:'#2e7d6b',기타:'#4a4a5a'};
+            typeOrder.forEach(function(type){
+                var items = typeMap[type];
+                if(!items || !items.length) return;
+                var total = items.length;
+                var hasSol = items.filter(function(it){ return it.p.sol && it.p.sol.length; }).length;
+                var noSol = total - hasSol;
+                var card = document.createElement('div');
+                card.className = 'm-coll-card';
+                card.innerHTML = '<div class="mcc-top">'
+                    +'<div class="mcc-icon" style="background:'+typeColors[type]+';">'+type+'</div>'
+                    +'<div class="mcc-info"><div class="mcc-name">'+type+'</div>'
+                    +'<div class="mcc-stat">'+total+'문제 · 정해 '+hasSol+'개'
+                    +(noSol?' · <span style="color:#e74c3c">미등록 '+noSol+'</span>':'')
+                    +'</div></div></div>';
+                (function(t,its){ card.onclick=function(){ showTypeGallery(t,its); }; })(type,items);
+                host.appendChild(card);
+            });
+        }
+
+        // 유형별 썸네일 갤러리
+        function showTypeGallery(type, items) {
+            var g = document.getElementById('mini-gallery'); if(!g) return;
+            document.getElementById('mg-coll-name').textContent = type+'형 ('+items.length+'문제)';
+            document.getElementById('mg-count').textContent = '';
+            var grid = document.getElementById('mg-grid'); grid.innerHTML = '';
+            if(_mgObserver){ _mgObserver.disconnect(); }
+            _mgObserver = new IntersectionObserver(function(entries){
+                entries.forEach(function(en){
+                    if(!en.isIntersecting) return;
+                    var cell=en.target, idx=+cell.dataset.idx;
+                    if(cell.dataset.filled) return;
+                    cell.dataset.filled='1';
+                    var bd=cell.querySelector('.mg-board-slot');
+                    if(bd) bd.innerHTML=miniBoardSVG(items[idx].p);
+                    _mgObserver.unobserve(cell);
+                });
+            }, {root:grid, rootMargin:'200px'});
+            var frag = document.createDocumentFragment();
+            items.forEach(function(item, idx){
+                var p=item.p, hasSol=p.sol&&p.sol.length;
+                var cell = document.createElement('div');
+                cell.className = 'mg-cell'+(hasSol?'':' nosol-cell');
+                cell.dataset.idx = idx;
+                cell.innerHTML = '<div class="mg-board-slot"></div>'
+                    +'<div class="mg-info">'
+                    +'<div class="mg-num">'+item.folder.sym+' '+p.n+'번'
+                    +(hasSol?'':' <span class="mg-nosol">정해없음</span>')+'</div>'
+                    +'<div class="mg-chapter">'+item.folder.display+'</div>'
+                    +'</div>';
+                (function(it){ cell.onclick=function(){
+                    selectFolderByInfo(it.folder);
+                    var i2=PROBLEMS.findIndex(function(pr){return pr.n===it.p.n;});
+                    if(i2>=0){ var gal=document.getElementById('mini-gallery');
+                        if(gal) gal.style.display='none';
+                        document.body.classList.remove('gallery-open');
+                        loadProblem(i2); }
+                }; })(item);
+                frag.appendChild(cell);
+                _mgObserver.observe(cell);
+            });
+            grid.appendChild(frag);
+            g.style.display='flex';
+            document.body.classList.add('gallery-open');
+            document.getElementById('mg-back').style.display='none';
+            var pb=document.getElementById('prob-box'); if(pb) pb.style.display='none';
+            mCloseNav();
+        }
+
         function mShowCollections(){ mRenderCollections(); mScreen('m-scr-coll'); mOpenNav(); }
 
         // 통계(표): 번호·시도·정답·힌트·정해 — 행 탭 → 풀기
