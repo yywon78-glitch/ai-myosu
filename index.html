@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v3.7</title>
+    <title>고전사활문제집 v3.8</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -818,7 +818,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.7</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v3.8</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">유형</button>
@@ -1458,6 +1458,10 @@
 
             // 되돌린 뒤 정해 라인에 복귀했는지로 재판정 — 아직 이탈 상태면 '오답 검토 중' 유지
             freeAfterWrong = (reviewMode && reviewMoves.length>0 && !onJunghaeLine());
+            // 정해 라인 복귀 시 수동→자동 자동 전환
+            if(!freeAfterWrong && reviewMode && reviewMoves.length>0 && answerMode==='manual'){
+                answerMode='auto'; try{localStorage.setItem('hh_mode','auto');}catch(e){} updateModeButtons();
+            }
             renderBoard();
             updateUI();
             updateSolveStatus();
@@ -5079,20 +5083,26 @@
             });
             var typeOrder = ['활','사','패','빅','연결','절단','득','기타'];
             var typeColors = {활:'#2e7d4e',사:'#7d2e2e',패:'#7d6b2e',빅:'#2e5a7d',연결:'#5a2e7d',절단:'#7d4a2e',득:'#2e7d6b',기타:'#4a4a5a'};
+            var typeDesc = {활:'돌을 살리는 문제',사:'돌을 잡는 문제',패:'패로 해결하는 문제',빅:'빅으로 해결하는 문제',연결:'돌을 연결하는 문제',절단:'상대 돌을 끊는 문제',득:'집을 얻는 문제',기타:'기타 유형의 문제'};
             typeOrder.forEach(function(type){
                 var items = typeMap[type];
                 if(!items || !items.length) return;
                 var total = items.length;
                 var hasSol = items.filter(function(it){ return it.p.sol && it.p.sol.length; }).length;
                 var noSol = total - hasSol;
+                var pct = total ? Math.round(hasSol/total*100) : 0;
                 var card = document.createElement('div');
                 card.className = 'm-coll-card';
                 card.innerHTML = '<div class="mcc-top">'
-                    +'<div class="mcc-icon" style="background:'+typeColors[type]+';">'+type+'</div>'
-                    +'<div class="mcc-info"><div class="mcc-name">'+type+'</div>'
-                    +'<div class="mcc-stat">'+total+'문제 · 정해 '+hasSol+'개'
-                    +(noSol?' · <span style="color:#e74c3c">미등록 '+noSol+'</span>':'')
-                    +'</div></div></div>';
+                    +'<div class="mcc-sym" style="background:'+typeColors[type]+';font-size:20px;letter-spacing:0;">'+type+'</div>'
+                    +'<div class="mcc-title">'
+                    +'<div class="mc-name">'+type+'</div>'
+                    +'<div class="mc-desc">'+typeDesc[type]+'</div>'
+                    +'</div></div>'
+                    +'<div class="mc-stat">전체 <b>'+total+'</b>문제 · 정해 '+hasSol+'개'
+                    +(noSol?' · <span style="color:#e74c3c;">미등록 '+noSol+'</span>':'')+'</div>'
+                    +'<div class="mc-bar"><i style="width:'+pct+'%"></i></div>'
+                    +'<div class="mcc-foot"><span class="mcc-hint">눌러서 썸네일 열기 ▶</span></div>';
                 (function(t,its){ card.onclick=function(){ showTypeGallery(t,its); }; })(type,items);
                 host.appendChild(card);
             });
