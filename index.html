@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v4.8</title>
+    <title>고전사활문제집 v4.9</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.8</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.9</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -4971,8 +4971,11 @@
             if(answerMode==='auto'){
                 // 자동: 상대 응수 자동 착수 (연속 상대 수도 처리)
                 autoResponding=true;
+                var _autoBreak=0;
                 while(moveList.length<reviewMoves.length && reviewMoves[moveList.length].player!==problemTurn){
+                    var _prevLen=moveList.length;
                     var nx=reviewMoves[moveList.length]; placeStone(nx.x, nx.y);
+                    if(moveList.length===_prevLen){ if(++_autoBreak>3) break; } else { _autoBreak=0; }
                 }
                 autoResponding=false;
                 if(moveList.length>=reviewMoves.length){ markSolved(p); return; }
