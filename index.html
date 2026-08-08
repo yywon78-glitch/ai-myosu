@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v4.6</title>
+    <title>고전사활문제집 v4.7</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.6</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.7</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -978,6 +978,16 @@
             // PROB_META 기반 사활 표시 (SGF desc 대신 Excel 분류 데이터 사용)
             var _pmk=(selectedFolderCol&&selectedFolderCol.builtin||'')+'_'+p.n;
             var _pmd=PROB_META[_pmk]||{};
+            // pb-sah: 흑선/백선 바로 뒤 사활 결과
+            var SAH_C={'흑사':'#e67e22','백사':'#e74c3c','흑활':'#4a90d9','백활':'#27ae60',
+                '사':'#ff8a7a','활':'#7fe0c4','흑선백활':'#3498db','백선흑활':'#16a085',
+                '패':'#b98cff','구분없음':''};
+            var _sahEl=document.getElementById('pb-sah');
+            if(_sahEl){
+                var _sah=_pmd.s||'';
+                if(_sah&&_sah!=='구분없음'){_sahEl.textContent=' · '+_sah;_sahEl.style.color=SAH_C[_sah]||'#cdb98a';}
+                else{_sahEl.textContent='';}
+            }
             // pb-result: 급수 표시만 (사활은 pb-sah로 이동)
             var _el = document.getElementById('pb-result');
             var out = level ? [levelKR(level)] : [];
@@ -985,7 +995,7 @@
             _el.style.color = '#cdb98a';
             // pb-meta: 위치 + 유형만 (사활 제외 — 위에서 표시)
             var _pmel=document.getElementById('pb-meta');
-            if(_pmel) _pmel.innerHTML=probMetaHTML(_pmd,true);
+            if(_pmel) _pmel.innerHTML=probMetaHTML(_pmd,true,true);
             box.style.display = 'flex';
             positionProbBox();
         }
@@ -1023,6 +1033,7 @@
             var base='display:inline-block;border-radius:4px;font-weight:700;line-height:1.4;';
             var out=[];
             if(m.p) out.push('<span class="meta-tag" style="'+base+sz+'background:'+(POS[m.p]||'#555')+';color:#fff;">'+m.p+'</span>');
+            if(!skipSah&&m.s&&m.s!=='구분없음') out.push('<span class="meta-tag" style="'+base+sz+'background:'+(SAH[m.s]||'#555')+';color:#fff;">'+m.s+'</span>');
             if(m.y) out.push('<span class="meta-tag" style="'+base+sz+'background:rgba(255,255,255,0.12);color:#d4d4d4;border:1px solid rgba(200,200,200,0.25);">'+m.y+'</span>');
             if(m.ok==='X') out.push('<span class="meta-tag" style="'+base+sz+'background:#7f1d1d;color:#fca5a5;">정해X</span>');
             return out.join('');
