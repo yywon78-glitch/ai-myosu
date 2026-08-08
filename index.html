@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v4.7</title>
+    <title>고전사활문제집 v4.8</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.7</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v4.8</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -1033,6 +1033,7 @@
             var base='display:inline-block;border-radius:4px;font-weight:700;line-height:1.4;';
             var out=[];
             if(m.p) out.push('<span class="meta-tag" style="'+base+sz+'background:'+(POS[m.p]||'#555')+';color:#fff;">'+m.p+'</span>');
+            if(!large&&m.t){var tc=m.t==='흑선'?'#2c3e50':'#c8d0d8';var fc=m.t==='흑선'?'#f5e6c8':'#1a252f';out.push('<span class="meta-tag" style="'+base+sz+'background:'+tc+';color:'+fc+';">'+m.t+'</span>');}
             if(!skipSah&&m.s&&m.s!=='구분없음') out.push('<span class="meta-tag" style="'+base+sz+'background:'+(SAH[m.s]||'#555')+';color:#fff;">'+m.s+'</span>');
             if(m.y) out.push('<span class="meta-tag" style="'+base+sz+'background:rgba(255,255,255,0.12);color:#d4d4d4;border:1px solid rgba(200,200,200,0.25);">'+m.y+'</span>');
             if(m.ok==='X') out.push('<span class="meta-tag" style="'+base+sz+'background:#7f1d1d;color:#fca5a5;">정해X</span>');
