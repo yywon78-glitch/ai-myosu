@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v5.2</title>
+    <title>고전사활문제집 v5.3</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.2</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.3</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -3232,21 +3232,25 @@
             showMessage(moveList.length + '수 이후부터 이어두기 — 저장 시 전체 기보로 저장됩니다');
         }
 
-        // 💡 힌트 — 현재 수순에서 정해의 다음 위치를 ⓗ 참조 마커로만 표시 (돌은 직접 두게, 보드는 안 건드림)
+        // 💡 힌트 — 직전 오답(정해 이탈 후 둔 수)을 지우고 정해 선상으로 복원 → 다음 정해 위치를 ⓗ 참조 마커로 표시
         function showHint() {
             if (!(reviewMode && reviewMoves && reviewMoves.length && reviewSetupBoard)) {
                 showMessage('이 문제는 힌트를 표시할 수 없습니다');
                 return;
             }
-            // 현재까지 정해와 일치한 수의 다음(=이번에 둘 정해수)이 힌트 위치
+            // 현재까지 정해와 일치한 수까지만 남기고 복원 — 그 이후(직전 오답 포함)는 지움
             var resume = junghaeMatchLen();
-            while (resume < reviewMoves.length && reviewMoves[resume].type !== 'stone') resume++;
-            if (resume >= reviewMoves.length) {
+            board = reviewSetupBoard.map(function(r){ return r.slice(); });
+            capturedBlack=0; capturedWhite=0; lastMove=null; koPoint=null; passCount=0; history=[]; moveList=[];
+            for(var _i=0;_i<resume;_i++){ var _m=reviewMoves[_i]; if(_m.type==='stone'){ applyReviewMove(_m.x,_m.y,_m.player); moveList.push({player:_m.player,type:'stone',x:_m.x,y:_m.y,moveNum:_i+1,coord:COORDS[_m.x]+(boardSize-_m.y)}); lastMove={x:_m.x,y:_m.y}; } }
+            currentPlayer = (resume===0)? problemTurn : (reviewMoves[resume-1].player==='black'?'white':'black');
+            freeAfterWrong=false; aiRespondMode=false; solveDone=false;
+            hintMove = (resume<reviewMoves.length) ? { x:reviewMoves[resume].x, y:reviewMoves[resume].y } : null;
+            if (!hintMove) {
+                renderBoard(); updateUI(); updateSolveStatus();
                 showMessage('정해 마지막까지 왔습니다 — 더 볼 힌트가 없어요');
                 return;
             }
-            var nm = reviewMoves[resume];
-            hintMove = { x: nm.x, y: nm.y };   // ⓗ 참조 마커 (착수하면 자동 제거됨)
             // 힌트 사용 횟수 기록
             if (curProblem >= 0 && typeof PROBLEMS !== 'undefined') {
                 var _pn = PROBLEMS[curProblem].n;
@@ -3254,8 +3258,8 @@
                 progress[_pn].hints = (progress[_pn].hints||0) + 1;
                 saveProgress(); refreshRow(curProblem);
             }
-            renderBoard(); updateUI();
-            showMessage('💡 힌트 ⓗ — 정해의 다음 위치입니다 (직접 두어보세요)');
+            renderBoard(); updateUI(); updateSolveStatus();
+            showMessage('💡 힌트 ⓗ — 직전 오답은 지웠어요. 정해 다음 위치에 직접 두세요');
         }
 
         function showJunghae() {
