@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v5.5</title>
+    <title>고전사활문제집 v5.6</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.5</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.6</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -912,10 +912,6 @@
         <button id="btn-hint" onclick="showHint()" style="background:linear-gradient(135deg,#8e44ad,#7d3c98);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">💡 힌트</button>
         <button id="btn-junghae" onclick="showJunghae()" style="background:linear-gradient(135deg,#e67e22,#ca6f1e);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">정해 보기 ▶</button>
         <button id="btn-allrec" onclick="mGallery(null)" style="background:rgba(230,126,34,0.22);color:#ffcf9e;font-weight:700;border:1px solid rgba(230,126,34,0.55);padding:6px 16px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">☰ 메뉴</button>
-        <div id="m-ref" title="이 문제 분류 등록">
-            <button id="m-ref-clean" type="button" onclick="setRef('clean')">정해만</button>
-            <button id="m-ref-hasref" type="button" onclick="setRef('ref')">참조유</button>
-        </div>
         <button id="btn-save-sol" onclick="saveSolution()" style="display:none;background:linear-gradient(135deg,#16a085,#1abc9c);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">💾 정해 저장</button>
     </div>
     <input type="file" id="sgf-input" accept=".sgf" style="display:none" onchange="loadSGFFile(event)">
