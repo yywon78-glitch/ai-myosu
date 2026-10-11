@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v5.1</title>
+    <title>고전사활문제집 v5.2</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.1</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.2</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -908,9 +908,10 @@
             <button onclick="reviewGoTo(reviewMoves.length)" title="끝">⏭</button>
         </div>
         <button id="btn-back" onclick="undo()" style="display:none;background:linear-gradient(135deg,#7f8c8d,#616a6b);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">◀ 뒤로</button>
-        <button id="btn-reset-problem" onclick="resetToProblem()" style="display:none;background:linear-gradient(135deg,#3498db,#2980b9);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">↺ 문제 초기화</button>
+        <button id="btn-reset-problem" onclick="resetToProblem()" style="display:none;background:linear-gradient(135deg,#3498db,#2980b9);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">↺ 초기화</button>
+        <button id="btn-hint" onclick="showHint()" style="background:linear-gradient(135deg,#8e44ad,#7d3c98);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">💡 힌트</button>
         <button id="btn-junghae" onclick="showJunghae()" style="background:linear-gradient(135deg,#e67e22,#ca6f1e);color:#fff;font-weight:700;border:none;padding:6px 18px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">정해 보기 ▶</button>
-        <button id="btn-allrec" onclick="mGallery(null)" style="background:rgba(230,126,34,0.22);color:#ffcf9e;font-weight:700;border:1px solid rgba(230,126,34,0.55);padding:6px 16px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">📖 전체기보</button>
+        <button id="btn-allrec" onclick="mGallery(null)" style="background:rgba(230,126,34,0.22);color:#ffcf9e;font-weight:700;border:1px solid rgba(230,126,34,0.55);padding:6px 16px;border-radius:6px;font-size:14px;cursor:pointer;white-space:nowrap;">☰ 메뉴</button>
         <div id="m-ref" title="이 문제 분류 등록">
             <button id="m-ref-clean" type="button" onclick="setRef('clean')">정해만</button>
             <button id="m-ref-hasref" type="button" onclick="setRef('ref')">참조유</button>
@@ -2994,6 +2995,9 @@
             document.getElementById('turn-text').textContent = currentPlayer === 'black' ? '흑' : '백';
             document.getElementById('black-captured').textContent = capturedBlack;
             document.getElementById('white-captured').textContent = capturedWhite;
+            // 힌트 버튼은 정해 보기 버튼과 같은 조건에서만 노출
+            var _bh=document.getElementById('btn-hint'), _bj=document.getElementById('btn-junghae');
+            if(_bh&&_bj) _bh.style.display = _bj.style.display;
         }
 
         function showMessage(msg) {
@@ -3226,6 +3230,32 @@
 
             renderBoard(); updateUI();
             showMessage(moveList.length + '수 이후부터 이어두기 — 저장 시 전체 기보로 저장됩니다');
+        }
+
+        // 💡 힌트 — 현재 수순에서 정해의 다음 위치를 ⓗ 참조 마커로만 표시 (돌은 직접 두게, 보드는 안 건드림)
+        function showHint() {
+            if (!(reviewMode && reviewMoves && reviewMoves.length && reviewSetupBoard)) {
+                showMessage('이 문제는 힌트를 표시할 수 없습니다');
+                return;
+            }
+            // 현재까지 정해와 일치한 수의 다음(=이번에 둘 정해수)이 힌트 위치
+            var resume = junghaeMatchLen();
+            while (resume < reviewMoves.length && reviewMoves[resume].type !== 'stone') resume++;
+            if (resume >= reviewMoves.length) {
+                showMessage('정해 마지막까지 왔습니다 — 더 볼 힌트가 없어요');
+                return;
+            }
+            var nm = reviewMoves[resume];
+            hintMove = { x: nm.x, y: nm.y };   // ⓗ 참조 마커 (착수하면 자동 제거됨)
+            // 힌트 사용 횟수 기록
+            if (curProblem >= 0 && typeof PROBLEMS !== 'undefined') {
+                var _pn = PROBLEMS[curProblem].n;
+                progress[_pn] = progress[_pn] || {tries:0, solved:false, solves:0, hints:0};
+                progress[_pn].hints = (progress[_pn].hints||0) + 1;
+                saveProgress(); refreshRow(curProblem);
+            }
+            renderBoard(); updateUI();
+            showMessage('💡 힌트 ⓗ — 정해의 다음 위치입니다 (직접 두어보세요)');
         }
 
         function showJunghae() {
