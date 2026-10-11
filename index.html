@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>고전사활문제집 v5.4</title>
+    <title>고전사활문제집 v5.5</title>
     <!-- PWA (안드로이드 홈화면 설치 / 오프라인) -->
     <meta name="theme-color" content="#1a252f">
     <meta name="mobile-web-app-capable" content="yes">
@@ -823,7 +823,7 @@
     <!-- 📱 모바일 전용 네비게이션 스택: 문제집 → 통계목록 → (전체기보/풀기) -->
     <div id="m-nav">
         <section id="m-scr-coll" class="m-scr">
-            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.4</span></div>
+            <div class="m-head"><span class="m-title">고전 사활 문제집</span><span class="m-sub">v5.5</span></div>
             <div class="m-tab-bar">
                 <button class="m-tab-btn active" id="tab-coll" onclick="switchTab('coll')">문제집</button>
                 <button class="m-tab-btn" id="tab-type" onclick="switchTab('type')">위치</button>
@@ -3244,8 +3244,7 @@
             capturedBlack=0; capturedWhite=0; lastMove=null; koPoint=null; passCount=0; history=[]; moveList=[];
             for(var _i=0;_i<resume;_i++){ var _m=reviewMoves[_i]; if(_m.type==='stone'){ applyReviewMove(_m.x,_m.y,_m.player); moveList.push({player:_m.player,type:'stone',x:_m.x,y:_m.y,moveNum:_i+1,coord:COORDS[_m.x]+(boardSize-_m.y)}); lastMove={x:_m.x,y:_m.y}; } }
             currentPlayer = (resume===0)? problemTurn : (reviewMoves[resume-1].player==='black'?'white':'black');
-            answerMode='auto'; try{localStorage.setItem('hh_mode','auto');}catch(e){} updateModeButtons();   // 오답 시 수동으로 바뀐 것을 힌트 후 자동으로 복원
-            freeAfterWrong=false; aiRespondMode=false; solveDone=false;
+            freeAfterWrong=false; aiRespondMode=false; solveDone=false;   // 모드(자동/수동)는 사용자 설정 그대로 유지
             hintMove = (resume<reviewMoves.length) ? { x:reviewMoves[resume].x, y:reviewMoves[resume].y } : null;
             if (!hintMove) {
                 renderBoard(); updateUI(); updateSolveStatus();
@@ -4994,9 +4993,8 @@
             var idx = moveList.length - 1;      // 방금 둔 수 = 정해의 idx번째여야 함
             var last = moveList[idx], exp = reviewMoves[idx];
             if(!exp || last.player!==exp.player || last.x!==exp.x || last.y!==exp.y){
-                // 오답 → 틀렸습니다 + 수동모드로 전환 + 오답검토중 (그 자리에 두고 계속 둬볼 수 있게)
+                // 오답 → 틀렸습니다 + 오답검토중 (모드는 바꾸지 않고 그대로 유지)
                 showWrongToast();
-                answerMode='manual'; try{localStorage.setItem('hh_mode','manual');}catch(e){} updateModeButtons();
                 freeAfterWrong = true;
                 updateSolveStatus();
                 return;
