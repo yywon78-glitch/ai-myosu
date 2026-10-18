@@ -651,6 +651,9 @@
         .m-tab-btn.active { color:#f5e6c8; border-bottom-color:#d4a056; }
         /* 정해없음 셀 */
         .mg-cell.nosol-cell { border-color:rgba(231,76,60,0.45); }
+        /* AI정해 셀 */
+        .mg-cell.ai-cell { border-color:rgba(56,139,253,0.55); }
+        .mg-cell.ai-cell .mg-num { color:#7dd3fc; }
 
         /* 문제집 카드 */
         .m-coll-card { background:rgba(0,0,0,0.32); border:1px solid rgba(245,230,200,0.14);
@@ -4623,6 +4626,7 @@
                 var solved=st.solved?'✅ 풀었음':'미풀이';
                 var _mk=(selectedFolderCol&&selectedFolderCol.builtin||'')+'_'+p.n;
                 var _pm=PROB_META[_mk]||{};
+                if(_pm.ok==='K') cell.classList.add('ai-cell');
                 cell.innerHTML='<div class="mg-num">'+p.n+'번</div>'
                     +'<div class="mg-board-slot"></div>'
                     +'<div class="mg-info">'
