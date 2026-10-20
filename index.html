@@ -234,11 +234,11 @@
         .pb-stone.white { background: radial-gradient(circle at 34% 30%, #ffffff, #d0d0d0 78%); box-shadow: 0 2px 5px rgba(0,0,0,.45); border: 1px solid #9a9a9a; }
         #pb-moves { font-size: 13px; color: #cdb98a; font-weight: 600; }
         #pb-result { font-size: 15px; font-weight: 700; color: #7fe0c4; }
-        #pb-status { display: none; font-size: 17px; font-weight: 800; padding: 10px 16px; border-radius: 10px; text-align: center; }
+        #pb-status { display: none; font-size: 14px; font-weight: 800; padding: 10px 13px; border-radius: 6px; text-align: center; flex:1; }
         /* 자동/수동 + 결과 표시줄 (보드 하단) */
-        #pb-statusline { display:flex; align-items:center; gap:10px; padding:8px 4px 4px; }
+        #pb-statusline { display:flex; align-items:center; gap:8px; padding:8px 4px 4px; }
         #m-mode { display:none; }
-        #m-mode button { padding:5px 12px; font-size:13px; font-weight:800; border-radius:7px; cursor:pointer;
+        #m-mode button { padding:10px 13px; font-size:14px; font-weight:800; border-radius:6px; cursor:pointer;
             background:rgba(0,0,0,0.35); color:#c8d8e8; border:1px solid rgba(245,230,200,0.25);
             -webkit-tap-highlight-color:transparent; }
         #m-mode button.active { background:linear-gradient(135deg,#d4a056,#b8860b); color:#1a252f; border-color:#d4a056; }
@@ -767,8 +767,8 @@
             #pb-moves, #pb-result { display:none !important; }
             /* 하단 자동/수동 + 결과 표시줄 */
             #pb-statusline { display:flex !important; align-items:center; gap:10px; padding:6px 4px 2px; }
-            #m-mode { display:flex !important; flex:0 0 auto; gap:5px; }
-            #pb-status { flex:1 1 auto; font-size:16px !important; text-align:left !important; padding:8px 14px !important; }
+            #m-mode { display:flex !important; flex:0 0 auto; gap:6px; }
+            #pb-status { flex:1 1 auto; font-size:14px !important; padding:10px 13px !important; text-align:left !important; }
             .pb-nav { display:flex !important; }   /* 이전/다음 문제 버튼 노출 */
             /* 하단 리뷰바 버튼 중앙 정렬 */
             #review-bar { justify-content:center; }
