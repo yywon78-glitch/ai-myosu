@@ -550,6 +550,12 @@
         #prob-list th { position:sticky; top:0; background:#243342; color:#d4a056; padding:5px 2px; font-size:10px; border-bottom:1px solid rgba(245,230,200,0.25); z-index:1; }
         #prob-list td { padding:4px 2px; text-align:center; color:#f5e6c8; border-bottom:1px solid rgba(245,230,200,0.06); white-space:nowrap; }
         .pl-title { text-align:left !important; padding-left:6px !important; }
+        .pl-result { font-size:11px; font-weight:700; white-space:nowrap; }
+        .pl-result.res-baeksa { color:#e74c3c; }
+        .pl-result.res-heuksa { color:#95a5a6; }
+        .pl-result.res-baekhwal { color:#2ecc71; }
+        .pl-result.res-heuksal { color:#3498db; }
+        .pl-result.res-pae { color:#f39c12; }
         .pl-row { cursor:pointer; }
         .pl-row:hover { background:rgba(212,160,86,0.15); }
         .pl-row.solved:not(.cur) td { color:#8fe0a8; }
@@ -876,7 +882,7 @@
 
         <div id="prob-list">
             <table>
-                <thead><tr><th>번호</th><th>제목</th><th>해법</th><th>힌트</th><th>정해</th><th>시도</th><th>완료</th></tr></thead>
+                <thead><tr><th>번호</th><th>제목</th><th>결과</th><th>해법</th><th>힌트</th><th>정해</th><th>시도</th><th>완료</th></tr></thead>
                 <tbody id="prob-tbody"></tbody>
             </table>
         </div>
@@ -4542,6 +4548,12 @@
                 tr.className='pl-row'+(i===curProblem?' cur':'')+(st.solved?' solved':'');
                 tr.appendChild(td(p.n));
                 tr.appendChild(td(colLabel+' '+p.n, 'pl-title'));
+                (function(){
+                    var rm='', rc='pl-result';
+                    if(p.desc){ var m=p.desc.match(/(백사|흑사|백활|흑활|패|수상전)/); if(m)rm=m[1]; }
+                    var cls={'백사':'res-baeksa','흑사':'res-heuksa','백활':'res-baekhwal','흑활':'res-heuksal','패':'res-pae'}[rm]||'';
+                    var rtd=document.createElement('td'); rtd.className=rc+(cls?' '+cls:''); rtd.textContent=rm||'—'; tr.appendChild(rtd);
+                })();
                 tr.appendChild(td(p.sol.length > 0 ? 'O' : 'X', p.sol.length > 0 ? 'pl-ok' : 'pl-hint'));
                 tr.appendChild(td(st.hints||0, st.hints?'pl-hint':''));
                 tr.appendChild(td(p.sol.length));
@@ -4570,9 +4582,9 @@
             var r=_rowEls[i]; if(!r) return;
             var p=PROBLEMS[i], st=progress[p.n]||{};
             var c=r.children;
-            if(c[3]){ c[3].textContent=st.hints||0; c[3].className=st.hints?'pl-hint':''; }
-            if(c[5]){ c[5].textContent=st.tries||0; }
-            if(c[6]){ c[6].textContent=st.solves||0; c[6].className=st.solves?'pl-ok':''; }
+            if(c[4]){ c[4].textContent=st.hints||0; c[4].className=st.hints?'pl-hint':''; }
+            if(c[6]){ c[6].textContent=st.tries||0; }
+            if(c[7]){ c[7].textContent=st.solves||0; c[7].className=st.solves?'pl-ok':''; }
             r.className='pl-row cur'+(st.solved?' solved':'');
             updateSolvedCount();
         }
