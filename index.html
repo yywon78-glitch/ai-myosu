@@ -988,6 +988,7 @@
             var _sahEl=document.getElementById('pb-sah');
             if(_sahEl){
                 var _sah=_pmd.s||'';
+                if(!_sah&&p.desc){var _dm=p.desc.match(/(백사|흑사|백활|흑활|패|수상전)/);if(_dm)_sah=_dm[1];}
                 if(_sah&&_sah!=='구분없음'){_sahEl.textContent=' · '+_sah;_sahEl.style.color=SAH_C[_sah]||'#cdb98a';}
                 else{_sahEl.textContent='';}
             }
